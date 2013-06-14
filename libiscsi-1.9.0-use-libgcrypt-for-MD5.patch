@@ -1,0 +1,151 @@
+--- libiscsi-1.9.0/configure.ac.gcrypt~	2013-02-24 17:24:58.000000000 +0100
++++ libiscsi-1.9.0/configure.ac	2013-06-14 02:49:45.519545953 +0200
+@@ -18,6 +18,9 @@ AC_SUBST(WARN_CFLAGS)
+ 
+ AC_CONFIG_HEADER(config.h)
+ 
++AC_CHECK_LIB([gcrypt], [gcry_control])
++AM_CONDITIONAL([HAVE_LIBGCRYPT], [test $ac_cv_lib_gcrypt_gcry_control = yes])
++
+ AC_CACHE_CHECK([for sin_len in sock],libiscsi_cv_HAVE_SOCK_SIN_LEN,[
+ AC_TRY_COMPILE([#include <sys/types.h>
+ #include <sys/socket.h>
+--- libiscsi-1.9.0/lib/login.c.gcrypt~	2013-02-19 02:47:58.000000000 +0100
++++ libiscsi-1.9.0/lib/login.c	2013-06-14 02:49:25.887226988 +0200
+@@ -25,13 +25,18 @@
+ #include <arpa/inet.h>
+ #endif
+ 
++#include "config.h"
+ #include <stdio.h>
++#include <assert.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include "iscsi.h"
+ #include "iscsi-private.h"
+ #include "scsi-lowlevel.h"
+ #include "md5.h"
++#ifdef HAVE_LIBGCRYPT
++#include <gcrypt.h>
++#endif
+ 
+ static int
+ iscsi_login_add_initiatorname(struct iscsi_context *iscsi, struct iscsi_pdu *pdu)
+@@ -569,6 +574,42 @@ iscsi_login_add_authalgorithm(struct isc
+ 
+ 	return 0;
+ }
++
++#ifndef HAVE_LIBGCRYPT
++typedef struct MD5Context *gcry_md_hd_t;
++#define gcry_md_write MD5Update
++#define GCRY_MD_MD5 1
++
++static inline void gcry_md_open(gcry_md_hd_t *hd, int algo, unsigned int flags)
++{
++	assert(algo == GCRY_MD_MD5 && flags == 0);
++	*hd = malloc(sizeof(struct MD5Context));
++	if (*hd) {
++		MD5Init(*hd);
++	}
++}
++
++static inline void gcry_md_putc(gcry_md_hd_t h, unsigned char c)
++{
++	MD5Update(h, &c, 1);
++}
++
++static inline char *gcry_md_read(gcry_md_hd_t h, int algo)
++{
++	unsigned char digest[16];
++	assert(algo == 0 || algo == GCRY_MD_MD5);
++
++	MD5Final(digest, h);
++	return memcpy(h->buf, digest, sizeof(digest));
++}
++
++static inline void gcry_md_close(gcry_md_hd_t h)
++{
++	memset(h, 0, sizeof(*h));
++	free(h);
++}
++#endif
++
+ 	
+ static int
+ iscsi_login_add_chap_username(struct iscsi_context *iscsi, struct iscsi_pdu *pdu)
+@@ -625,7 +666,7 @@ iscsi_login_add_chap_response(struct isc
+ 	char * strp;
+ 	unsigned char c, cc[2];
+ 	unsigned char digest[16];
+-	struct MD5Context ctx;
++	gcry_md_hd_t ctx;
+ 	int i;
+ 
+ 	if (iscsi->current_phase != ISCSI_PDU_LOGIN_CSG_SECNEG
+@@ -633,22 +674,27 @@ iscsi_login_add_chap_response(struct isc
+ 		return 0;
+ 	}
+ 
++	gcry_md_open(&ctx, GCRY_MD_MD5, 0);
++	if (!ctx) {
++		iscsi_set_error(iscsi, "Cannot create MD5 algorithm");
++		return -1;
++	}
++
+ 	if (!iscsi->chap_c[0]) {
+ 		iscsi_set_error(iscsi, "No CHAP challenge found");
+ 		return -1;
+ 	}
+-	MD5Init(&ctx);
+-	c = iscsi->chap_i;
+-	MD5Update(&ctx, &c, 1);
+-	MD5Update(&ctx, (unsigned char *)iscsi->passwd, strlen(iscsi->passwd));
++	gcry_md_putc(ctx, iscsi->chap_i);
++	gcry_md_write(ctx, (unsigned char *)iscsi->passwd, strlen(iscsi->passwd));
+ 	
+ 	strp = iscsi->chap_c;
+ 	while (*strp != 0) {
+ 		c = (h2i(strp[0]) << 4) | h2i(strp[1]);
+ 		strp += 2;
+-		MD5Update(&ctx, &c, 1);
++		gcry_md_putc(ctx, c);
+ 	}
+-	MD5Final(digest, &ctx);
++	memcpy(digest, gcry_md_read(ctx, 0), sizeof(digest));
++	gcry_md_close(ctx);
+ 
+ 	strncpy(str,"CHAP_R=0x",MAX_STRING_SIZE);
+ 	if (iscsi_pdu_add_data(iscsi, pdu, (unsigned char *)str, strlen(str))
+--- libiscsi-1.9.0/Makefile.am.gcrypt~	2013-02-24 17:56:17.000000000 +0100
++++ libiscsi-1.9.0/Makefile.am	2013-06-14 02:53:52.093550216 +0200
+@@ -29,10 +29,14 @@ dist_noinst_DATA = lib/libiscsi.syms
+ lib_LTLIBRARIES = lib/libiscsi.la
+ lib_libiscsi_la_SOURCES = \
+ 	lib/connect.c lib/crc32c.c lib/discovery.c lib/init.c \
+-	lib/login.c lib/md5.c lib/nop.c lib/pdu.c lib/iscsi-command.c \
++	lib/login.c lib/nop.c lib/pdu.c lib/iscsi-command.c \
+ 	lib/scsi-lowlevel.c lib/socket.c lib/sync.c lib/task_mgmt.c \
+ 	lib/logging.c
+ 
++if !HAVE_LIBGCRYPT
++lib_libiscsi_la_SOURCES += lib/md5.c
++endif
++
+ SONAME=$(firstword $(subst ., ,$(VERSION)))
+ SOREL=$(shell printf "%d%02d%02d" $(subst ., ,$(VERSION)))
+ lib_libiscsi_la_LDFLAGS = \
+@@ -315,8 +319,12 @@ lib_libiscsi_convenience_la_SOURCES = $(
+ bin/ld_iscsi.o: src/bin_ld_iscsi-ld_iscsi.o lib/libiscsi_convenience.la
+ 	$(LIBTOOL) --mode=link $(CC) -o $@ $^
+ 
++if HAVE_LIBGCRYPT
++GCRYPT_LIB = $(shell pkg-config --libs libgcrypt)
++endif
++
+ # 3) Manually create the .so file.
+ bin_SCRIPTS = bin/ld_iscsi.so
+ bin/ld_iscsi.so: bin/ld_iscsi.o
+-	$(CC) -shared -o bin/ld_iscsi.so bin/ld_iscsi.o -ldl
++	$(CC) $(LDFLAGS) -shared -o bin/ld_iscsi.so bin/ld_iscsi.o -ldl $(GCRYPT_LIB)
+ endif
