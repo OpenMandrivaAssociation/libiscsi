@@ -55,6 +55,9 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %patch2 -p1 -b .werror~
 
 %build
+%ifarch %{ix86}
+LDFLAGS="%{ldflags} -fuse-ld=bfd" \
+%endif
 %configure	 --disable-static
 %make
 
