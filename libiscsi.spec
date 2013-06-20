@@ -53,6 +53,7 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %patch0 -p1 -b .gcrypt~
 %patch1 -p1 -b .aliasing~
 %patch2 -p1 -b .werror~
+autoreconf -fi
 
 %build
 %ifarch %{ix86}
