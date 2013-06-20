@@ -34,6 +34,7 @@ a network.
 Summary:	iSCSI client development libraries
 Group:		Development/C
 Provides:	iscsi-devel = %{EVRD}
+Requires:	%{libname} = %{EVRD}
 
 %description -n	%{devname}
 The libiscsi-devel package includes the header files for libiscsi.
