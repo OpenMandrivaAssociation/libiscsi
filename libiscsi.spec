@@ -56,7 +56,7 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 autoreconf -fi
 
 %build
-%ifarch %{ix86}
+%ifarch %{ix86} %arm
 LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 %endif
 %configure	 --disable-static
