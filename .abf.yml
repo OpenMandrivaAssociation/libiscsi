@@ -1,2 +1,4 @@
+removed_sources:
+  libiscsi-1.9.0.tar.gz: b3d079cbafab68fe39a8061c4ed5094353094e3b
 sources:
-  "libiscsi-1.9.0.tar.gz": b3d079cbafab68fe39a8061c4ed5094353094e3b
+  libiscsi-1.11.0.tar.gz: 04000160df25aed331f371f4e8a95d8c1088c496

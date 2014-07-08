@@ -4,16 +4,14 @@
 
 Name:		libiscsi
 Summary:	iSCSI client library
-Version:	1.9.0
-Release:	7
+Version:	1.11.0
+Release:	1
 License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
 
 Source0:	https://sites.google.com/site/libiscsitarballs/libiscsitarballs/%{name}-%{version}.tar.gz
-Patch0:		libiscsi-1.9.0-use-libgcrypt-for-MD5.patch
-Patch1:		libiscsi-1.9.0-fix-strict-aliasing-violation.patch
-Patch2:		libiscsi-1.9.0-disable-Werror.patch
+Patch0:		libiscsi-clang-werror.patch
 
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
@@ -50,9 +48,7 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 
 %prep
 %setup -q
-%patch0 -p1 -b .gcrypt~
-%patch1 -p1 -b .aliasing~
-%patch2 -p1 -b .werror~
+%apply_patches
 autoreconf -fi
 
 %build
@@ -60,7 +56,7 @@ autoreconf -fi
 LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 %endif
 %configure	 --disable-static
-%make
+make
 
 %install
 %makeinstall_std
