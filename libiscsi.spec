@@ -1,17 +1,16 @@
-%define	major	1
+%define	major	4
 %define	libname	%mklibname iscsi %{major}
 %define	devname	%mklibname -d iscsi
 
 Name:		libiscsi
 Summary:	iSCSI client library
-Version:	1.11.0
-Release:	2
+Version:	1.12.0
+Release:	1
 License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
 
 Source0:	https://sites.google.com/site/libiscsitarballs/libiscsitarballs/%{name}-%{version}.tar.gz
-Patch0:		libiscsi-clang-werror.patch
 
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
@@ -49,13 +48,13 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %prep
 %setup -q
 %apply_patches
-autoreconf -fi
+autoreconf -f
 
 %build
 %ifarch %{ix86} %arm
 LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 %endif
-%configure	 --disable-static
+%configure	 --disable-static CFLAGS="$CFLAGS -Wno-error"
 make
 
 %install
@@ -76,22 +75,5 @@ make
 %{_bindir}/iscsi-ls
 %{_bindir}/iscsi-inq
 %{_bindir}/iscsi-readcapacity16
-
-%changelog
-* Fri Jun 14 2013 Per Øyvind Karlsen <peroyvind@moondrake.net> 1.9.0-1
-- initial moondrake package based on fedora package
-
-* Fri May 3 2013 Paolo Bonzini <pbonzini@redhat.com> - 1.7.0-4
-- Add patch 2 for FIPS mode
-- Add patch 3 to avoid segmentation fault on iscsi-tools
-
-* Thu Mar 7 2013 Paolo Bonzini <pbonzini@redhat.com> - 1.7.0-3
-- Correct license for libiscsi-utils, prefer %%global to %%define
-- Add Requires
-- Remove %%clean section
-
-* Fri Feb 22 2013 Paolo Bonzini <pbonzini@redhat.com> - 1.7.0-2
-- Use %%config for ld.so.conf.d file.
-
-* Fri Feb 22 2013 Paolo Bonzini <pbonzini@redhat.com> - 1.7.0-1
-- Initial version (bug 914752)
+%{_bindir}/iscsi-swp
+%{_mandir}/man1/*
