@@ -4,14 +4,12 @@
 
 Name:		libiscsi
 Summary:	iSCSI client library
-Version:	1.12.0
-Release:	2
+Version:	1.15.0
+Release:	1
 License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
-
 Source0:	https://sites.google.com/site/libiscsitarballs/libiscsitarballs/%{name}-%{version}.tar.gz
-
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
 
@@ -54,8 +52,9 @@ autoreconf -f
 %ifarch %{ix86} %arm
 LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 %endif
-%configure	 --disable-static CFLAGS="$CFLAGS -Wno-error"
-make
+%configure --disable-static CFLAGS="$CFLAGS -Wno-error"
+
+%make
 
 %install
 %makeinstall_std
