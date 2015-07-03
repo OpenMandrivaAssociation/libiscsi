@@ -75,4 +75,5 @@ LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 %{_bindir}/iscsi-inq
 %{_bindir}/iscsi-readcapacity16
 %{_bindir}/iscsi-swp
+%{_bindir}/iscsi-perf
 %{_mandir}/man1/*
