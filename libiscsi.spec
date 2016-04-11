@@ -46,15 +46,17 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %prep
 %setup -q
 %apply_patches
-autoreconf -f
+# disable examples
+sed -i 's!examples!!g' Makefile.in Makefile.am
+autoreconf -fiv
 
 %build
-%ifarch %{ix86} %arm
+%ifarch %{ix86} %armx
 LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 %endif
 %configure --disable-static CFLAGS="$CFLAGS -Wno-error"
 
-%make
+%make LDFLAGS="%{ldflags}" CFLAGS="%{optflags}"
 
 %install
 %makeinstall_std
@@ -70,7 +72,6 @@ LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 
 %files utils
 %doc README TODO
-%{_bindir}/ld_iscsi.so
 %{_bindir}/iscsi-ls
 %{_bindir}/iscsi-inq
 %{_bindir}/iscsi-readcapacity16
