@@ -51,7 +51,7 @@ sed -i 's!examples!!g' Makefile.in Makefile.am
 autoreconf -fiv
 
 %build
-%ifarch %{ix86} %armx
+%ifarch %{ix86}
 LDFLAGS="%{ldflags} -fuse-ld=bfd" \
 %endif
 %configure --disable-static CFLAGS="$CFLAGS -Wno-error"
