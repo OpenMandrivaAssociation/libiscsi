@@ -10,8 +10,6 @@ License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
 Source0:	https://sites.google.com/site/libiscsitarballs/libiscsitarballs/%{name}-%{version}.tar.gz
-# remove me on the next update
-Source1:	iser-private.h
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
 
@@ -48,7 +46,6 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %prep
 %setup -q
 %apply_patches
-#cp %{SOURCE1} include
 # disable examples
 sed -i 's!examples!!g' Makefile.in Makefile.am
 autoreconf -fiv
