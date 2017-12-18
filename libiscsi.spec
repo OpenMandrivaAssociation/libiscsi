@@ -1,6 +1,6 @@
-%define	major	7
-%define	libname	%mklibname iscsi %{major}
-%define	devname	%mklibname -d iscsi
+%define major 7
+%define libname %mklibname iscsi %{major}
+%define devname %mklibname -d iscsi
 
 Name:		libiscsi
 Summary:	iSCSI client library
@@ -47,13 +47,16 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %setup -q
 %apply_patches
 # disable examples
-sed -i 's!examples!!g' Makefile.in Makefile.am
-autoreconf -fiv
+sed -i 's!examples!!g' Makefile.am
+./autogen.sh
 
 %build
 %ifarch %{ix86}
-LDFLAGS="%{ldflags} -fuse-ld=bfd" \
+%global ldflags %{ldflags} -fuse-ld=bfd
 %endif
+
+%setuo_compile_flags
+
 %configure --disable-static CFLAGS="$CFLAGS -Wno-error"
 
 %make LDFLAGS="%{ldflags}" CFLAGS="%{optflags}"
