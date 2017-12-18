@@ -55,7 +55,7 @@ sed -i 's!examples!!g' Makefile.am
 %global ldflags %{ldflags} -fuse-ld=bfd
 %endif
 
-%setuo_compile_flags
+%setup_compile_flags
 
 %configure --disable-static CFLAGS="$CFLAGS -Wno-error"
 
