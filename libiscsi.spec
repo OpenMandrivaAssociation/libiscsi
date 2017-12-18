@@ -4,7 +4,7 @@
 
 Name:		libiscsi
 Summary:	iSCSI client library
-Version:	1.17.0
+Version:	1.18.0
 Release:	1
 License:	LGPLv2+
 Group:		System/Libraries
