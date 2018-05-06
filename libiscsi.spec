@@ -12,6 +12,7 @@ URL:		https://github.com/sahlberg/%{name}
 Source0:	https://sites.google.com/site/libiscsitarballs/libiscsitarballs/%{name}-%{version}.tar.gz
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
+BuildRequires:	pkgconfig(gpg-error)
 
 %description
 libiscsi is a library for attaching to iSCSI resources across
