@@ -10,6 +10,7 @@ License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
 Source0:	https://github.com/sahlberg/libiscsi/archive/%{version}.tar.gz
+Patch0:		libiscsi-1.19.0-clang9.patch
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
 BuildRequires:	pkgconfig(gpg-error)
@@ -45,8 +46,7 @@ The libiscsi-utils package provides a set of assorted utilities to connect
 to iSCSI servers without having to set up the Linux iSCSI initiator.
 
 %prep
-%setup -q
-%apply_patches
+%autosetup -p1
 # disable examples
 sed -i 's!examples!!g' Makefile.am
 ./autogen.sh
