@@ -60,7 +60,7 @@ sed -i 's!examples!!g' Makefile.am
 
 %configure --disable-static CFLAGS="$CFLAGS -Wno-error"
 
-%make LDFLAGS="%{ldflags}" CFLAGS="%{optflags}"
+%make LDFLAGS="%{ldflags}" CFLAGS="%{optflags}" CC=%{__cc}
 
 %install
 %makeinstall_std
