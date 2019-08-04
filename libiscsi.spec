@@ -1,15 +1,15 @@
-%define major 8
+%define major 9
 %define libname %mklibname iscsi %{major}
 %define devname %mklibname -d iscsi
 
 Name:		libiscsi
 Summary:	iSCSI client library
-Version:	1.18.0
-Release:	3
+Version:	1.19.0
+Release:	1
 License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
-Source0:	https://sites.google.com/site/libiscsitarballs/libiscsitarballs/%{name}-%{version}.tar.gz
+Source0:	https://github.com/sahlberg/libiscsi/archive/%{version}.tar.gz
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
 BuildRequires:	pkgconfig(gpg-error)
