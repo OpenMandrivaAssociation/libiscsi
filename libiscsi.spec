@@ -5,7 +5,7 @@
 Name:		libiscsi
 Summary:	iSCSI client library
 Version:	1.19.0
-Release:	1
+Release:	2
 License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
