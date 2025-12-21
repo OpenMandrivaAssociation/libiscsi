@@ -11,6 +11,11 @@ Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
 Source0:	https://github.com/sahlberg/libiscsi/archive/%{version}.tar.gz
 Patch0:		libiscsi-1.19.0-clang9.patch
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libgcrypt)
 BuildRequires:	pkgconfig(gpg-error)
