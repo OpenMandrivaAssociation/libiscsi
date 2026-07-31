@@ -4,13 +4,13 @@
 
 Name:		libiscsi
 Summary:	iSCSI client library
-Version:	1.19.0
-Release:	2
+Version:	1.20.3
+Release:	1
 License:	LGPLv2+
 Group:		System/Libraries
 URL:		https://github.com/sahlberg/%{name}
 Source0:	https://github.com/sahlberg/libiscsi/archive/%{version}.tar.gz
-Patch0:		libiscsi-1.19.0-clang9.patch
+# dropped (no longer applies): Patch0:		libiscsi-1.20.3-clang9.patch
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libtool-base
